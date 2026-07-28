@@ -1094,6 +1094,7 @@ def deepgemm_post_process_fp8_weight_block(
     use_e8m0: bool,
     is_bmm: bool = False,
     bmm_batch_size: int = 0,
+    keep_weight_scale_fp32_layout: bool = False,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     assert wq.dtype == torch.float8_e4m3fn, (
         "Expected quantized tensor dtype "
@@ -1112,6 +1113,9 @@ def deepgemm_post_process_fp8_weight_block(
         )
         if use_e8m0:
             requant_weight_ue8m0_inplace(wq, ws, block_size=quant_block_shape)
+
+    if keep_weight_scale_fp32_layout and not use_e8m0 and not is_bmm:
+        return wq, ws
 
     if is_bmm:
         # Reshape 2D weight/scale to 3D for grouped BMM (einsum):

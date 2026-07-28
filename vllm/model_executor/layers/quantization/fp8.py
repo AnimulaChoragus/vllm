@@ -336,6 +336,12 @@ class Fp8LinearMethod(LinearMethodBase):
         layer.output_size_per_partition = output_size_per_partition
         layer.orig_dtype = params_dtype
         layer.weight_block_size = None
+        layer.keep_deepgemm_weight_scale_fp32_layout = getattr(
+            self.quant_config, "keep_deepgemm_weight_scale_fp32_layout", False
+        )
+        layer.force_deepgemm_e8m0 = getattr(
+            self.quant_config, "force_deepgemm_e8m0", None
+        )
 
         if self.block_quant:
             assert self.weight_block_size is not None
